@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Foundational Model Development Roadmap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page dashboard with a sticky top navigation bar for direct access to each phase of the model development lifecycle. The core user experience is centered around a visual, interactive flowchart of the five main phases, providing a non-linear way to explore the content. Each phase is a dedicated section featuring a two-column layout: the left column contains concise, explanatory text derived from the report, while the right column presents interactive visualizations (charts, diagrams) of the key data and comparisons. This structure was chosen to make the dense, technical information highly digestible and engaging, allowing users to simultaneously read about a concept and interact with its visual representation, which is more effective for understanding and retention than a linear text document. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Five-phase development lifecycle -> Goal: Provide a high-level overview and navigation -> Viz: Interactive HTML/CSS flowchart -> Interaction: Clicking a phase scrolls to the corresponding section -> Justification: Creates a strong visual anchor and intuitive navigation.
+        - Report Info: Dataset comparison table (Phase I) -> Goal: Compare scale and content -> Viz: Bar Chart (Chart.js) -> Interaction: Hover for details -> Justification: Best for comparing quantitative data.
+        - Report Info: Architecture comparison table (Phase II) -> Goal: Compare complex trade-offs -> Viz: Grouped Bar Chart (Chart.js) & dynamic text blocks -> Interaction: Buttons to switch views -> Justification: Combines quantitative and qualitative comparison effectively.
+        - Report Info: Alignment techniques table (Phase IV) -> Goal: Compare methodology and complexity -> Viz: Horizontal Bar Chart (Chart.js) & clickable process diagram (HTML/CSS) -> Interaction: Click steps for info -> Justification: Clearly shows process flow and comparative metrics.
+        - Report Info: Data preprocessing steps (Phase I) -> Goal: Explain a sequence -> Viz: HTML/CSS diagram -> Interaction: Click for details -> Justification: Lightweight, interactive, and avoids external libraries/SVG.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #fff;
+            background-color: #4f46e5; /* indigo-600 */
+        }
+        .phase-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .interactive-diagram-step {
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .interactive-diagram-step.active {
+            background-color: #e0e7ff; /* indigo-100 */
+            border-color: #4f46e5; /* indigo-600 */
+        }
+        .tab-button.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <h1 class="text-xl md:text-2xl font-bold text-indigo-600">Foundational Model Roadmap</h1>
+                <div class="hidden lg:flex items-center space-x-1">
+                    <a href="#intro" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Intro</a>
+                    <a href="#phase1" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Phase I</a>
+                    <a href="#phase2" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Phase II</a>
+                    <a href="#phase3" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Phase III</a>
+                    <a href="#phase4" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Phase IV</a>
+                    <a href="#phase5" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Phase V</a>
+                    <a href="#conclusion" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700">Conclusion</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+
+        <section id="intro" class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">An Interactive Guide to Building Foundational Models</h2>
+            <p class="max-w-3xl mx-auto text-stone-600">
+                This application translates the complex, multi-year endeavor of creating a foundational AI model into an interactive journey. Explore the five critical phases, from curating petabytes of data to deploying at scale. Click on any phase below to begin.
+            </p>
+        </section>
+
+        <!-- Interactive Roadmap Diagram -->
+        <section class="mb-20">
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                <a href="#phase1" class="phase-card bg-white p-4 rounded-lg shadow-md w-full md:w-48 text-center border-t-4 border-indigo-500">
+                    <div class="text-3xl mb-2">💾</div>
+                    <h3 class="font-semibold">Phase I</h3>
+                    <p class="text-sm text-stone-500">The Data Foundation</p>
+                </a>
+                <div class="text-2xl text-stone-400 font-mono">&gt;</div>
+                <a href="#phase2" class="phase-card bg-white p-4 rounded-lg shadow-md w-full md:w-48 text-center border-t-4 border-indigo-500">
+                    <div class="text-3xl mb-2">🏛️</div>
+                    <h3 class="font-semibold">Phase II</h3>
+                    <p class="text-sm text-stone-500">Architectural Blueprints</p>
+                </a>
+                <div class="text-2xl text-stone-400 font-mono">&gt;</div>
+                <a href="#phase3" class="phase-card bg-white p-4 rounded-lg shadow-md w-full md:w-48 text-center border-t-4 border-indigo-500">
+                    <div class="text-3xl mb-2">🔥</div>
+                    <h3 class="font-semibold">Phase III</h3>
+                    <p class="text-sm text-stone-500">The Crucible (Training)</p>
+                </a>
+                <div class="text-2xl text-stone-400 font-mono">&gt;</div>
+                <a href="#phase4" class="phase-card bg-white p-4 rounded-lg shadow-md w-full md:w-48 text-center border-t-4 border-indigo-500">
+                    <div class="text-3xl mb-2">🤝</div>
+                    <h3 class="font-semibold">Phase IV</h3>
+                    <p class="text-sm text-stone-500">Alignment & Refinement</p>
+                </a>
+                <div class="text-2xl text-stone-400 font-mono">&gt;</div>
+                <a href="#phase5" class="phase-card bg-white p-4 rounded-lg shadow-md w-full md:w-48 text-center border-t-4 border-indigo-500">
+                    <div class="text-3xl mb-2">🚀</div>
+                    <h3 class="font-semibold">Phase V</h3>
+                    <p class="text-sm text-stone-500">Validation & Deployment</p>
+                </a>
+            </div>
+        </section>
+        
+        <!-- Phase I: Data Foundation -->
+        <section id="phase1" class="mb-20 pt-16 -mt-16">
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-2">Phase I: The Data Foundation</h2>
+                <p class="text-stone-600 mb-8">The performance, capabilities, and biases of a foundational model are overwhelmingly determined by its training data. This initial phase involves acquiring, cleaning, and processing petabytes of multimodal data to create a high-quality training corpus. Explore the scale of common datasets and the critical preprocessing pipeline.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-lg">Comparing Pre-Training Datasets</h3>
+                        <p class="text-sm text-stone-500 mb-4">The chart visualizes the relative scale of prominent text and image-text datasets. Hover over the bars to see the size and key characteristics of each corpus. Note that sizes are represented on a logarithmic scale to accommodate the vast differences.</p>
+                        <div class="chart-container">
+                            <canvas id="datasetChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-lg">The Data Preprocessing Gauntlet</h3>
+                        <p class="text-sm text-stone-500 mb-4">Raw data must undergo a rigorous multi-stage pipeline to become suitable for training. Click on each step to learn more about its purpose and methods.</p>
+                        <div id="data-pipeline" class="flex flex-col space-y-2">
+                            <div class="interactive-diagram-step border-2 border-stone-200 p-3 rounded-lg flex items-center space-x-3" data-step="cleaning">
+                                <span class="bg-indigo-500 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">1</span>
+                                <div><h4 class="font-medium">Cleaning & Normalization</h4></div>
+                            </div>
+                            <div class="interactive-diagram-step border-2 border-stone-200 p-3 rounded-lg flex items-center space-x-3" data-step="filtering">
+                                <span class="bg-indigo-500 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">2</span>
+                                <div><h4 class="font-medium">Quality Filtering</h4></div>
+                            </div>
+                            <div class="interactive-diagram-step border-2 border-stone-200 p-3 rounded-lg flex items-center space-x-3" data-step="deduplication">
+                                <span class="bg-indigo-500 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">3</span>
+                                <div><h4 class="font-medium">Deduplication</h4></div>
+                            </div>
+                             <div class="interactive-diagram-step border-2 border-stone-200 p-3 rounded-lg flex items-center space-x-3" data-step="decontamination">
+                                <span class="bg-indigo-500 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">4</span>
+                                <div><h4 class="font-medium">Decontamination</h4></div>
+                            </div>
+                        </div>
+                        <div id="pipeline-details" class="mt-4 p-4 bg-stone-50 rounded-lg min-h-[120px] text-sm text-stone-700">
+                            Select a step to see details.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase II: Architecture -->
+        <section id="phase2" class="mb-20 pt-16 -mt-16">
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-2">Phase II: Architectural Blueprints</h2>
+                <p class="text-stone-600 mb-8">This phase concerns the design of the neural network itself. While the Transformer is the de facto standard, key architectural decisions dictate the model's efficiency, scalability, and capabilities. Compare the dominant architectural paradigms below.</p>
+                <div class="flex justify-center space-x-2 mb-6">
+                    <button class="tab-button px-4 py-2 rounded-md font-medium bg-stone-200 text-stone-700" data-arch="transformer">Dense Transformer</button>
+                    <button class="tab-button px-4 py-2 rounded-md font-medium bg-stone-200 text-stone-700" data-arch="moe">Mixture-of-Experts (MoE)</button>
+                    <button class="tab-button px-4 py-2 rounded-md font-medium bg-stone-200 text-stone-700" data-arch="ssm">State-Space Model (SSM)</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div id="arch-details">
+                        <!-- Content will be dynamically inserted here -->
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-lg">Architectural Trade-Offs</h3>
+                        <p class="text-sm text-stone-500 mb-4">This chart compares the architectures on key performance and resource metrics. The values are qualitative rankings (1=Poor, 2=Good, 3=Excellent) to illustrate their relative strengths and weaknesses.</p>
+                        <div class="chart-container">
+                            <canvas id="archChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase III: Training -->
+        <section id="phase3" class="mb-20 pt-16 -mt-16">
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-2">Phase III: The Crucible (Training)</h2>
+                <p class="text-stone-600 mb-8">The computationally intensive pre-training phase is where the model learns from the prepared data over weeks or months on a supercomputer-scale cluster. Success hinges on mastering distributed training frameworks and ensuring the stability of the long-running process.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-lg">Distributed Training Frameworks</h3>
+                        <p class="text-sm text-stone-500 mb-4">Training large models requires partitioning the model and data across thousands of accelerators. Frameworks like PyTorch FSDP and Microsoft's DeepSpeed manage this complexity. The chart compares their memory efficiency strategies.</p>
+                        <div class="chart-container">
+                            <canvas id="distTrainingChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-indigo-600">Hardware at Hyperscale</h4>
+                            <p class="text-sm text-stone-600">Training consumes tens of exa-FLOPs on clusters of thousands of GPUs (NVIDIA A100/H100) or TPUs (Google). The high-speed interconnect between these chips is as crucial as the chips themselves to prevent communication bottlenecks.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-indigo-600">Self-Supervised Learning</h4>
+                            <p class="text-sm text-stone-600">The model learns without human labels by solving a "pretext task." For language models, this is typically **next-token prediction**, which forces the model to learn grammar, facts, and reasoning to predict the next word in a sequence.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-indigo-600">Optimization with AdamW</h4>
+                            <p class="text-sm text-stone-600">The AdamW optimizer is the standard for adjusting the model's billions of parameters. It efficiently minimizes error and includes a corrected form of weight decay, leading to more stable training and better generalization.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase IV: Alignment -->
+        <section id="phase4" class="mb-20 pt-16 -mt-16">
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-2">Phase IV: Alignment and Refinement</h2>
+                <p class="text-stone-600 mb-8">A raw, pre-trained model is not a useful product. This phase shapes the model's behavior to be helpful, honest, and harmless. It involves teaching the model to follow instructions and aligning its outputs with human values and preferences. Click the steps to explore the process.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="font-semibold mb-2 text-lg">The Alignment Pipeline</h3>
+                        <div id="alignment-pipeline" class="flex flex-col space-y-2">
+                            <div class="interactive-diagram-step border-2 border-stone-200 p-3 rounded-lg" data-step="sft">
+                                <h4 class="font-medium">1. Supervised Fine-Tuning (SFT)</h4>
+                                <p class="text-sm text-stone-500">Teaches the model to follow instructions using a dataset of high-quality prompt-response pairs.</p>
+                            </div>
+                            <div class="text-center text-stone-400 text-xl">↓</div>
+                            <div class="interactive-diagram-step border-2 border-stone-200 p-3 rounded-lg" data-step="preference">
+                                <h4 class="font-medium">2. Preference Tuning (RLHF or DPO)</h4>
+                                <p class="text-sm text-stone-500">Refines the model's behavior based on human feedback, teaching it what constitutes a "good" response.</p>
+                            </div>
+                        </div>
+                        <div id="alignment-details" class="mt-4 p-4 bg-stone-50 rounded-lg min-h-[120px]">
+                            <!-- Content will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 text-lg">Comparing Alignment Techniques</h3>
+                        <p class="text-sm text-stone-500 mb-4">This chart compares the complexity and stability of the primary alignment methods. DPO has emerged as a more stable and efficient alternative to the complex RLHF pipeline.</p>
+                        <div class="chart-container">
+                            <canvas id="alignmentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase V: Deployment -->
+        <section id="phase5" class="mb-20 pt-16 -mt-16">
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-2">Phase V: Validation and Deployment</h2>
+                <p class="text-stone-600 mb-8">The final phase involves rigorous evaluation of the model's capabilities and safety, optimizing it for efficient inference, and deploying it on a scalable, secure infrastructure to serve end-users.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold mb-4 text-lg">Evaluation and Safety</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 border-l-4 border-indigo-500 bg-indigo-50 rounded-r-lg">
+                                <h4 class="font-semibold">Holistic Evaluation</h4>
+                                <p class="text-sm text-stone-600">Goes beyond simple accuracy. Frameworks like Stanford HELM assess models on robustness, fairness, bias, and toxicity to provide a complete picture of performance.</p>
+                            </div>
+                            <div class="p-4 border-l-4 border-indigo-500 bg-indigo-50 rounded-r-lg">
+                                <h4 class="font-semibold">Red Teaming</h4>
+                                <p class="text-sm text-stone-600">An adversarial effort to find vulnerabilities. Experts creatively probe the model to uncover harmful failure modes not found in standard testing, ensuring safety before release.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-4 text-lg">Inference Optimization</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 border-l-4 border-teal-500 bg-teal-50 rounded-r-lg">
+                                <h4 class="font-semibold">Quantization</h4>
+                                <p class="text-sm text-stone-600">Reduces the numerical precision of model weights (e.g., from 32-bit to 8-bit), dramatically reducing memory footprint and increasing speed with minimal accuracy loss.</p>
+                            </div>
+                            <div class="p-4 border-l-4 border-teal-500 bg-teal-50 rounded-r-lg">
+                                <h4 class="font-semibold">FlashAttention</h4>
+                                <p class="text-sm text-stone-600">An optimized algorithm that speeds up the core attention mechanism by 2-4x by minimizing slow memory access, enabling faster inference and longer context handling.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Conclusion -->
+        <section id="conclusion" class="pt-16 -mt-16">
+            <h2 class="text-2xl font-bold text-center mb-8">Conclusion: Grand Challenges and Future Trajectories</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold mb-2">💸 Cost & Centralization</h3>
+                    <p class="text-sm text-stone-600">The immense cost of training risks concentrating power in a few large corporations, potentially stifling innovation and diversity.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold mb-2">⚖️ Bias, Fairness & Misuse</h3>
+                    <p class="text-sm text-stone-600">Models can learn and amplify societal biases from internet data and can be misused for creating disinformation at scale.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold mb-2">🔒 Privacy</h3>
+                    <p class="text-sm text-stone-600">Models can memorize and regurgitate sensitive or personal information from their training data, posing a significant privacy risk.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold mb-2">🤔 Interpretability</h3>
+                    <p class="text-sm text-stone-600">The "black box" nature of models makes it difficult to understand their reasoning, creating hurdles for trust and accountability.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const appData = {
+                datasets: {
+                    labels: ['Common Crawl', 'RefinedWeb', 'The Pile', 'C4', 'Starcoder', 'LAION-5B', 'DataComp-1B'],
+                    sizes: [5000000, 5000, 800, 750, 783, 5850, 1000], // Petabytes for CC, Trillion Tokens for RW, GB for others, Billion Pairs for image
+                    units: ['PB (raw)', 'T tokens', 'GB', 'GB', 'GB', 'B pairs', 'B pairs'],
+                    descriptions: [
+                        'Unparalleled scale but extremely noisy raw web data.',
+                        'Web-scale with high-quality filtering and deduplication.',
+                        'High diversity from 22 curated sources (web, books, code).',
+                        'A cleaner, deduplicated version of Common Crawl.',
+                        'Essential for state-of-the-art code generation models.',
+                        'Massive scale for multimodal training, but with ethical issues.',
+                        'High-quality curated subset proven to be highly effective.'
+                    ]
+                },
+                pipeline: {
+                    cleaning: '<strong>Cleaning & Normalization:</strong> The first step ensures data consistency. It involves converting text to a standard encoding (UTF-8), identifying document languages, and standardizing whitespace.',
+                    filtering: '<strong>Quality Filtering:</strong> This stage removes low-quality content using heuristics (e.g., document length, repetitive phrases) or model-based classifiers trained to score documents for quality.',
+                    deduplication: '<strong>Deduplication:</strong> Crucial for data diversity and preventing overfitting. This removes exact and near-duplicates using techniques like MinHash to improve model generalization.',
+                    decontamination: '<strong>Decontamination:</strong> This critical final step removes any data from the training set that overlaps with evaluation benchmarks, ensuring that model tests fairly measure generalization, not memorization.'
+                },
+                architectures: {
+                    transformer: {
+                        title: 'Dense Transformer',
+                        description: 'The de facto standard since 2017. It processes all tokens in parallel using a self-attention mechanism, allowing it to capture long-range dependencies. However, its computational and memory costs scale quadratically with sequence length, making it inefficient for very long contexts.',
+                        pros: ['Mature and well-understood', 'Excellent performance on many tasks'],
+                        cons: ['Poor scalability for long sequences (O(N²))', 'High computational cost']
+                    },
+                    moe: {
+                        title: 'Mixture-of-Experts (MoE)',
+                        description: 'An architecture that enables massive model sizes without a proportional increase in compute cost. Instead of one large feed-forward network, it uses multiple smaller "experts" and a router that dynamically selects a few experts to process each token. This creates a sparse activation pattern.',
+                        pros: ['Scales total parameters efficiently', 'Constant FLOPs/token as experts increase'],
+                        cons: ['Extremely high memory usage for inference', 'Can be unstable to train']
+                    },
+                    ssm: {
+                        title: 'State-Space Model (SSM)',
+                        description: 'A promising alternative inspired by control systems. Architectures like Mamba process sequences with near-linear complexity, making them exceptionally efficient for very long contexts. They maintain a hidden "state" that evolves over time, avoiding the quadratic bottleneck of attention.',
+                        pros: ['Excellent for very long contexts', 'Low memory usage and fast inference'],
+                        cons: ['Newer, less mature technology', 'Implementation can be complex']
+                    },
+                    chartData: {
+                        labels: ['Computational Complexity', 'Memory (Inference)', 'Long Context Suitability'],
+                        datasets: [
+                            { label: 'Dense Transformer', data: [1, 2, 1], backgroundColor: 'rgba(79, 70, 229, 0.7)' },
+                            { label: 'MoE', data: [1, 1, 1], backgroundColor: 'rgba(219, 39, 119, 0.7)' },
+                            { label: 'SSM', data: [3, 3, 3], backgroundColor: 'rgba(5, 150, 105, 0.7)' }
+                        ]
+                    }
+                },
+                distTraining: {
+                    labels: ['Parameters', 'Gradients', 'Optimizer States'],
+                    datasets: [
+                        { label: 'Data Parallelism (Baseline)', data: [1, 1, 1], backgroundColor: 'rgba(217, 119, 6, 0.7)' },
+                        { label: 'ZeRO Stage 2 / FSDP (Partial)', data: [1, 3, 3], backgroundColor: 'rgba(79, 70, 229, 0.7)' },
+                        { label: 'ZeRO Stage 3 / FSDP (Full)', data: [3, 3, 3], backgroundColor: 'rgba(5, 150, 105, 0.7)' }
+                    ]
+                },
+                alignment: {
+                    details: {
+                        sft: '<strong>Supervised Fine-Tuning (SFT):</strong> This is the first and essential alignment step. The pre-trained model is further trained on a curated dataset of thousands of high-quality "instruction" and "response" pairs. This teaches the model the format of a conversation and how to generate helpful, relevant answers.',
+                        preference: '<strong>Preference Tuning:</strong> This step teaches the model nuanced human preferences. It uses a dataset where humans have ranked different model responses to the same prompt. <br><br><strong>RLHF</strong> uses this data to train a "reward model" and then uses reinforcement learning to optimize the main model. <br><strong>DPO</strong> achieves the same goal more directly and stably with a specialized loss function, avoiding the complexity of RL.'
+                    },
+                    chartData: {
+                        labels: ['SFT', 'RLHF', 'DPO'],
+                        datasets: [
+                            {
+                                label: 'Complexity',
+                                data: [1, 3, 1],
+                                backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                            },
+                            {
+                                label: 'Stability',
+                                data: [3, 1, 3],
+                                backgroundColor: 'rgba(5, 150, 105, 0.7)',
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // Chart 1: Datasets
+            const datasetCtx = document.getElementById('datasetChart').getContext('2d');
+            new Chart(datasetCtx, {
+                type: 'bar',
+                data: {
+                    labels: appData.datasets.labels,
+                    datasets: [{
+                        label: 'Relative Scale (Log)',
+                        data: appData.datasets.sizes,
+                        backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'logarithmic',
+                            beginAtZero: true,
+                            title: { display: true, text: 'Size (Log Scale)' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const size = appData.datasets.sizes[index];
+                                    const unit = appData.datasets.units[index];
+                                    const desc = appData.datasets.descriptions[index];
+                                    return [`Size: ${size} ${unit}`, `Note: ${desc}`];
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Phase 1: Data Pipeline Interaction
+            const pipelineSteps = document.querySelectorAll('#data-pipeline .interactive-diagram-step');
+            const pipelineDetails = document.getElementById('pipeline-details');
+            pipelineSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    pipelineSteps.forEach(s => s.classList.remove('active'));
+                    step.classList.add('active');
+                    const stepKey = step.dataset.step;
+                    pipelineDetails.innerHTML = appData.pipeline[stepKey];
+                });
+            });
+
+            // Phase 2: Architecture Interaction
+            const archButtons = document.querySelectorAll('.tab-button');
+            const archDetailsContainer = document.getElementById('arch-details');
+            let archChart;
+
+            function updateArchView(archKey) {
+                const archData = appData.architectures[archKey];
+                archButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.arch === archKey);
+                });
+                
+                let prosList = archData.pros.map(pro => `<li class="flex items-start"><span class="text-green-500 mr-2">✓</span>${pro}</li>`).join('');
+                let consList = archData.cons.map(con => `<li class="flex items-start"><span class="text-red-500 mr-2">✗</span>${con}</li>`).join('');
+
+                archDetailsContainer.innerHTML = `
+                    <h3 class="font-semibold mb-2 text-lg">${archData.title}</h3>
+                    <p class="text-sm text-stone-600 mb-4">${archData.description}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div><h4 class="font-medium mb-1">Advantages</h4><ul class="space-y-1">${prosList}</ul></div>
+                        <div><h4 class="font-medium mb-1">Disadvantages</h4><ul class="space-y-1">${consList}</ul></div>
+                    </div>
+                `;
+                
+                if (archChart) {
+                    archChart.data.datasets.forEach(dataset => {
+                        dataset.backgroundColor = dataset.label.toLowerCase().includes(archKey) ? dataset.backgroundColor.replace('0.7', '1') : dataset.backgroundColor.replace('1', '0.7');
+                    });
+                    archChart.update();
+                }
+            }
+            
+            const archCtx = document.getElementById('archChart').getContext('2d');
+            archChart = new Chart(archCtx, {
+                type: 'bar',
+                data: appData.architectures.chartData,
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 1) return 'Poor';
+                                    if (value === 2) return 'Good';
+                                    if (value === 3) return 'Excellent';
+                                }
+                            },
+                            max: 3,
+                            min: 0,
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            archButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    updateArchView(button.dataset.arch);
+                });
+            });
+            updateArchView('transformer'); // Initial view
+
+            // Phase 3: Distributed Training Chart
+            const distTrainingCtx = document.getElementById('distTrainingChart').getContext('2d');
+            new Chart(distTrainingCtx, {
+                type: 'bar',
+                data: appData.distTraining,
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Memory Savings by Sharding Strategy (Qualitative)' },
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 1) return 'High Usage';
+                                    if (value === 2) return 'Medium';
+                                    if (value === 3) return 'Low Usage';
+                                }
+                            },
+                            max: 3,
+                            min: 0,
+                            title: { display: true, text: 'Memory Usage' }
+                        }
+                    }
+                }
+            });
+            
+            // Phase 4: Alignment Interaction
+            const alignmentSteps = document.querySelectorAll('#alignment-pipeline .interactive-diagram-step');
+            const alignmentDetails = document.getElementById('alignment-details');
+            
+            alignmentSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    alignmentSteps.forEach(s => s.classList.remove('active'));
+                    step.classList.add('active');
+                    const stepKey = step.dataset.step;
+                    alignmentDetails.innerHTML = appData.alignment.details[stepKey];
+                });
+            });
+            alignmentDetails.innerHTML = 'Click a step to learn more.';
+            
+            const alignmentCtx = document.getElementById('alignmentChart').getContext('2d');
+            new Chart(alignmentCtx, {
+                type: 'bar',
+                data: appData.alignment.chartData,
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 1) return 'Low';
+                                    if (value === 2) return 'Medium';
+                                    if (value === 3) return 'High';
+                                }
+                            },
+                            max: 3,
+                            min: 0,
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Nav link highlighting on scroll
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
